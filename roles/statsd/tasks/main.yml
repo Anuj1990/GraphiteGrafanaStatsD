@@ -1,6 +1,21 @@
 ---
+- name: Install initial package
+  apt: name=dh-systemd state=present
+
 - name: clone statsd
-  git: repo=https://github.com/etsy/statsd.git dest=/src/statsd version=v0.7.2 update=no
+  git: repo=https://github.com/etsy/statsd.git dest=/opt/statsd
+
+- name: Running package build
+  command: cd /opt/statsd; dpkg-buildpackage
+
+- name: Installing built package
+  command: cd /opt/; dpkg -i statsd*
 
 - name: Configure statsd
-  template: src=localConfig.js.j2 dest=/src/statsd/config.js
+  template: src=localConfig.js.j2 dest=/etc/statsd/config.js
+
+- name: Enable service
+  command: systemctl enable statsd
+
+- name: Start Statsd service
+  service: name=statsd state=restarted enabled=yes

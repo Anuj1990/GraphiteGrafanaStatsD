@@ -1,28 +1,22 @@
-daemon off;
-user www-data;
-worker_processes 1;
-pid /var/run/nginx.pid;
+<VirtualHost *:80>
 
-events {
-  worker_connections 1024;
-}
+        WSGIDaemonProcess _graphite processes=5 threads=5 display-name='%{GROUP}' inactivity-timeout=120 user=_graphite group=_graphite
+        WSGIProcessGroup _graphite
+        WSGIImportScript /usr/share/graphite-web/graphite.wsgi process-group=_graphite application-group=%{GLOBAL}
+        WSGIScriptAlias / /usr/share/graphite-web/graphite.wsgi
 
-http {
-  sendfile on;
-  tcp_nopush on;
-  tcp_nodelay on;
-  keepalive_timeout 65;
-  types_hash_max_size 2048;
-  server_tokens off;
+        Alias /content/ /usr/share/graphite-web/static/
+        <Location "/content/">
+                SetHandler None
+        </Location>
 
-  server_names_hash_bucket_size 32;
+        ErrorLog ${APACHE_LOG_DIR}/graphite-web_error.log
 
-  include /etc/nginx/mime.types;
-  default_type application/octet-stream;
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
 
-  access_log off;
-  error_log /var/log/supervisor/nginx_error.log;
+        CustomLog ${APACHE_LOG_DIR}/graphite-web_access.log combined
 
-  gzip on;
-  gzip_disable "msie6";
-}
+</VirtualHost>
+

@@ -16,7 +16,7 @@ SECRET_KEY = '{{ graphite.secret_key }}'
 # In Django 1.5+ set this to the list of hosts your graphite instances is
 # accessible as. See:
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-ALLOWED_HOSTS
-ALLOWED_HOSTS = [ '*' ]
+#ALLOWED_HOSTS = [ '*' ]
 
 # Set your local timezone (Django's default is America/Chicago)
 # If your graphs appear to be offset by a couple hours then this probably
@@ -28,9 +28,9 @@ TIME_ZONE = 'UTC'
 #DOCUMENTATION_URL = "http://graphite.readthedocs.org/"
 
 # Logging
-#LOG_RENDERING_PERFORMANCE = True
-#LOG_CACHE_PERFORMANCE = True
-#LOG_METRIC_ACCESS = True
+LOG_RENDERING_PERFORMANCE = True
+LOG_CACHE_PERFORMANCE = True
+LOG_METRIC_ACCESS = True
 
 # Enable full debug page display on exceptions (Internal Server Error pages)
 #DEBUG = True
@@ -47,7 +47,7 @@ TIME_ZONE = 'UTC'
 # You should not use the loopback address (127.0.0.1) here if using clustering
 # as every webapp in the cluster should use the exact same values to prevent
 # unneeded cache misses. Set to [] to disable caching of images and fetched data
-MEMCACHE_HOSTS = ['localhost:11211']
+#MEMCACHE_HOSTS = ['localhost:11211']
 #DEFAULT_CACHE_DURATION = 60 # Cache images and data for 1 minute
 
 
@@ -56,16 +56,15 @@ MEMCACHE_HOSTS = ['localhost:11211']
 #####################################
 # Change only GRAPHITE_ROOT if your install is merely shifted from /opt/graphite
 # to somewhere else
-#GRAPHITE_ROOT = '/opt/graphite'
+GRAPHITE_ROOT = '/usr/share/graphite-web'
 
 # Most installs done outside of a separate tree such as /opt/graphite will only
 # need to change these three settings. Note that the default settings for each
 # of these is relative to GRAPHITE_ROOT
-#CONF_DIR = '/opt/graphite/conf'
-#STORAGE_DIR = '/opt/graphite/storage'
-#CONTENT_DIR = '/opt/graphite/webapp/content'
+CONF_DIR = '/etc/graphite'
+STORAGE_DIR = '/var/lib/graphite/whisper'
+CONTENT_DIR = '/usr/share/graphite-web/static'
 
-# To further or fully customize the paths, modify the following. Note that the
 # default settings for each of these are relative to CONF_DIR and STORAGE_DIR
 #
 ## Webapp config files
@@ -74,6 +73,12 @@ MEMCACHE_HOSTS = ['localhost:11211']
 
 ## Data directories
 # NOTE: If any directory is unreadable in DATA_DIRS it will break metric browsing
+WHISPER_DIR = '/var/lib/graphite/whisper'
+#RRD_DIR = '/opt/graphite/storage/rrd'
+#DATA_DIRS = [WHISPER_DIR, RRD_DIR] # Default: set from the above variables
+LOG_DIR = '/var/log/graphite'
+INDEX_FILE = '/var/lib/graphite/search_index'  # Search index file
+
 #WHISPER_DIR = '/opt/graphite/storage/whisper'
 #RRD_DIR = '/opt/graphite/storage/rrd'
 #DATA_DIRS = [WHISPER_DIR, RRD_DIR] # Default: set from the above variables
@@ -100,14 +105,14 @@ MEMCACHE_HOSTS = ['localhost:11211']
 # Authentication Configuration #
 #####################################
 ## LDAP / ActiveDirectory authentication setup
-{% if graphite_ldap_enabled is defined and graphite_ldap_enabled %}
-USE_LDAP_AUTH = True
-LDAP_URI = "{{ graphite_ldap_uri }}"
-LDAP_SEARCH_BASE = "{{ graphite_ldap_search_base }}"
-LDAP_BASE_USER = "{{ graphite_ldap_base_user }}"
-LDAP_BASE_PASS = "{{ graphite_ldap_base_pass }}"
-LDAP_USER_QUERY = "{{ graphite_ldap_user_query }}"
-{% else %}
+#{% if graphite_ldap_enabled is defined and graphite_ldap_enabled %}
+#USE_LDAP_AUTH = True
+#LDAP_URI = "{{ graphite_ldap_uri }}"
+#LDAP_SEARCH_BASE = "{{ graphite_ldap_search_base }}"
+#LDAP_BASE_USER = "{{ graphite_ldap_base_user }}"
+#LDAP_BASE_PASS = "{{ graphite_ldap_base_pass }}"
+#LDAP_USER_QUERY = "{{ graphite_ldap_user_query }}"
+#{% else %}
 #USE_LDAP_AUTH = True
 #LDAP_SERVER = "ldap.mycompany.com"
 #LDAP_PORT = 389
@@ -131,7 +136,7 @@ LDAP_USER_QUERY = "{{ graphite_ldap_user_query }}"
 # See http://www.python-ldap.org/ for further details on these options.
 
 ## REMOTE_USER authentication. See: https://docs.djangoproject.com/en/dev/howto/auth-remote-user/
-#USE_REMOTE_USER_AUTHENTICATION = True
+USE_REMOTE_USER_AUTHENTICATION = True
 
 # Override the URL for the login link (e.g. for django_openid_auth)
 #LOGIN_URL = '/account/login'
@@ -158,19 +163,16 @@ LDAP_USER_QUERY = "{{ graphite_ldap_user_query }}"
 # The default is 'django.db.backends.sqlite3' with file 'graphite.db'
 # located in STORAGE_DIR
 #
-#DATABASES = {
-#    'default': {
-#        # You can swap out the engine for MySQL easily by changing this value
-#        # to ``django.db.backends.mysql`` or to PostgreSQL with
-#        # ``django.db.backends.postgresql_psycopg2``
-#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#        'NAME': '{{ db_graphite.name }}',
-#        'USER': '{{ db_graphite.user }}',
-#        'PASSWORD': '{{ db_graphite.password }}',
-#        'HOST': 'localhost',
-#        'PORT': '',
-#    }
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '{{ db_graphite.name }}',
+        'USER': '{{ db_graphite.user }}',
+        'PASSWORD': '{{ db_graphite.password }}',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 #########################
 # Cluster Configuration #
