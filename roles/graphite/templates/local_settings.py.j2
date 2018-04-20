@@ -165,7 +165,7 @@ USE_REMOTE_USER_AUTHENTICATION = True
 #
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': '{{ db_graphite.name }}',
         'USER': '{{ db_graphite.user }}',
         'PASSWORD': '{{ db_graphite.password }}',
